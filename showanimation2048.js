@@ -17,7 +17,7 @@ function showMoveAnimation(fromx,fromy,tox,toy) {
     numberCell.animate({
       top:getPosTop(tox,toy),
       left:getPosLeft(tox,toy)
-    },200);
+    },100);
 }
 
 function updateScore(score){

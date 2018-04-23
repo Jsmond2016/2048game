@@ -42,7 +42,7 @@ function prepareForMobile() {
 }
 
 function init() {
-
+    //初始化盘格边距
     for (var i = 0; i < 4; i++) {
         for (var j = 0; j < 4; j++) {
             var gridCell = $("#grid-cell-" + i + "-" + j);
@@ -52,7 +52,7 @@ function init() {
             });
         }
     }
-
+    //初始化盘格数据
     for (var i = 0; i < 4; i++) {
         board[i] = new Array();
         hasConflicted[i] = new Array();
@@ -76,7 +76,6 @@ function updataBoardView() {
             var theNumberCell = $('#number-cell-' + i + '-' + j);
 
             if (board[i][j] === 0) {
-
                 theNumberCell.css({
                     "width": "0",
                     "height": "0",

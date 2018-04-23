@@ -69,7 +69,7 @@ function getNumberColor(number) {
 
 function canMoveLeft(board) {
     for (var i = 0; i < 4; i++) {
-        for (var j = 1; j < 4; j++) {
+        for (var j = 1; j < 4; j++) { // 第一列不能左移，不用进行判断
             if (board[i][j] !== 0) {
                 if (board[i][j - 1] == 0 || board[i][j - 1] == board[i][j]) {
                     return true;
@@ -83,7 +83,7 @@ function canMoveLeft(board) {
 function canMoveRight(board) {
 
     for (var i = 0; i < 4; i++) {
-        for (var j = 2; j >= 0; j--) {
+        for (var j = 2; j >= 0; j--) {   //最后一列不能右移，不用判断
             if (board[i][j] !== 0) {
                 if (board[i][j + 1] == 0 || board[i][j + 1] == board[i][j]) {
                     return true;
@@ -95,7 +95,7 @@ function canMoveRight(board) {
 }
 
 function canMoveUp(board) {
-    for (var i = 1; i < 4; i++) {
+    for (var i = 1; i < 4; i++) { //第一行不能上移，不用判断
         for (var j = 0; j < 4; j++) {
             if (board[i][j] !== 0) {
                 if (board[i - 1][j] === 0 || board[i - 1][j] === board[i][j]) {
@@ -144,6 +144,7 @@ function noBlockVertical(i, k, j, board) {
 
 }
 
+// 没有空余盘格
 function nomove(board) {
     if(canMoveLeft(board)||canMoveRight(board)||canMoveUp(board)||canMoveDown(board)){
       return false;
