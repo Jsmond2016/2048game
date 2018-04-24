@@ -28,6 +28,7 @@ header p{
 	font-family: arial;
 	font-size: 25px;
 	margin: 20px auto;
+	height: 35px;
 }
 #grid-container{
 	width:460px;
