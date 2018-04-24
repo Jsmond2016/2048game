@@ -239,6 +239,58 @@
 
   ```
 
+  - 动画效果，使用到的是 `jQuery.animate` 这个API
+
+    具体[使用](http://www.runoob.com/jquery/eff-animate.html) : `(selector).animate({styles},speed,easing,callback)`
+
+  过渡动画一：数字变化动画
+
+  ```js
+  function showNumberWithAnimation(i,j,randNum){
+  	var numberCell=$("#number-cell-"+i+"-"+j);
+  	numberCell.css({
+  		"background-color":getNumberBackgroundColor(randNum),
+  		"color":getNumberColor(randNum),
+  	});
+  	numberCell.text(randNum);
+  	numberCell.animate({
+  		width: cellSideLength,
+  		height: cellSideLength,
+  		'line-height': cellSideLength,
+  		left: getPosLeft(i,j),
+  		top: getPosTop(i,j)
+  	},50);
+  }
+  ```
+
+  过渡动画二： 位置移动变化动画
+
+  ```js
+  function showMoveAnimation(fromx,fromy,tox,toy) {
+      var  numberCell=$("#number-cell-"+fromx+"-"+fromy);
+      numberCell.animate({
+        top: getPosTop(tox,toy),
+        left: getPosLeft(tox,toy)
+      },100);
+  }
+  ```
+
+  过渡动画三：得分数字变化
+
+  ```js
+  function updateScore(score){
+  	$("#score").text(score);
+  	$("#score").animate({
+  		'font-size': '1.2em',
+  	},50,()=>{
+  		$("#score").animate({
+  			'font-size': '1em',
+  		},50)
+  	})
+  }
+
+  ```
+
   ​
 
 
