@@ -1,8 +1,8 @@
 
-documentWidth=window.screen.availWidth;
-gridContainerWidth=0.92*documentWidth;
-cellSideLength=0.18*documentWidth;
-cellSpace=0.04*documentWidth;
+documentWidth = window.screen.availWidth;
+gridContainerWidth = 0.92*documentWidth;
+cellSideLength = 0.18*documentWidth;
+cellSpace = 0.04*documentWidth;
 
 
 

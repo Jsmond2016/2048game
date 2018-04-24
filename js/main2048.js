@@ -36,6 +36,7 @@ function prepareForMobile() {
     $gridCell.css({
         "width": cellSideLength,
         "height": cellSideLength,
+        // "line-height": gridContainerWidth - 2 * cellSpace,
         "border-radius": 0.02 * gridContainerWidth
     });
 
@@ -96,11 +97,13 @@ function updataBoardView() {
                 if (board[i][j] > 1000) {
                     theNumberCell.css({
                         "line-height": cellSideLength + "px",
+                        "height": cellSideLength + "px",
                         "font-size": 0.4 * cellSideLength + "px"
                     });
                 } else {
                     theNumberCell.css({
                         "line-height": cellSideLength + "px",
+                        "height": cellSideLength + "px",
                         "font-size": 0.6 * cellSideLength + "px"
                     });
                 }
@@ -120,7 +123,7 @@ function generateOneNumber() {
     if (nospace(board)) {
         return false;
     }
-    //随机一个位置
+    //随机找到一个位置
     var randx = parseInt(Math.floor(Math.random() * 4));
     var randy = parseInt(Math.floor(Math.random() * 4));
     var times = 0;
@@ -134,7 +137,7 @@ function generateOneNumber() {
 
         times++;
     }
-
+    //随机查找空位失败后手动查找
     if (times === 50) {
         for (var i = 0; i < 4; i++) {
             for (var j = 0; j < 4; j++) {
