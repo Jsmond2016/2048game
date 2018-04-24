@@ -5,6 +5,7 @@ function showNumberWithAnimation(i,j,randNum){
 		"color":getNumberColor(randNum),
 	});
 	numberCell.text(randNum);
+	
 	numberCell.animate({
 		width: cellSideLength,
 		height: cellSideLength,

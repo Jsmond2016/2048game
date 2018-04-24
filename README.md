@@ -197,7 +197,43 @@
         }
     ```
 
-  - 这其中，也封装了一些数据操作到其他函数中，我们一起来看看。
+(2) 游戏结束逻辑
+
+当盘格内没有空盘格且不能移动时，游戏结束
+
+```js
+function isGameOver() {
+    if (nospace(board) && nomove(board)) {
+        showGameOver();
+    }
+}
+```
+
+```js
+// 不能继续移动
+function nomove(board) {
+  if(canMoveLeft(board)||canMoveRight(board)||canMoveUp(board)||canMoveDown(board)){
+      return false;
+    }
+    return true;
+}
+```
+
+````js
+// 没有空余盘格
+function nospace(board) {
+    for (var i = 0; i < 4; i++) {
+        for (var j = 0; j < 4; j++) {
+            if (board[i][j] === 0) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+````
+
+  - 除了上述操作以外，也封装了一些数据操作到其他函数中，我们一起来看看。
 
     数据变化后动画的呈现
 
@@ -291,19 +327,106 @@
 
   ```
 
-  ​
-
-
-
-
+ 
 
 移动端优化
 
 - 界面自适应
 
+（1）要支持移动端，第一步： 添加 `meta:vp` 在 `index` 页面中，避免用户对网页进行缩放
+
+`    <meta name="viewport" content="width=device-width,height=device-height,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">`
+
+(2) 其次，要使得我们的页面和不同像素的手机相匹配，能够正常浏览和使用，此时，沃恩的布局就不能够使用固定值布局，而是使用 百分比布局。
+
+```js
+documentWidth = window.screen.availWidth;
+gridContainerWidth = 0.92*documentWidth;
+cellSideLength = 0.18*documentWidth;
+cellSpace = 0.04*documentWidth;
+
+function prepareForMobile() {
+
+    if (documentWidth > 500) {
+        gridContainerWidth = 500;
+        cellSpace = 20;
+        cellSideLength = 100;
+    }
+
+    var $gridContainer = $("#grid-container");
+    var $gridCell = $(".grid-cell");
+    $gridContainer.css({
+        "width": gridContainerWidth - 2 * cellSpace,
+        "height": gridContainerWidth - 2 * cellSpace,
+        "padding": cellSpace,
+        "border-radius": 0.02 * gridContainerWidth
+    });
+    $gridCell.css({
+        "width": cellSideLength,
+        "height": cellSideLength,
+        "line-height": gridContainerWidth - 2 * cellSpace,
+        "border-radius": 0.02 * gridContainerWidth
+    });
+
+}
+```
+
+（3）动态增加的 `number-cell` 位置和边距设置
+
+```js
+
+function updateBoardView() {
+    $('.number-cell').remove();
+    for (var i = 0; i < 4; i++) {
+        for (var j = 0; j < 4; j++) {
+            var id = "number-cell-" + i + "-" + j;
+            $("#grid-container").append("<div class='number-cell' id=" + id + "></div>");
+            var theNumberCell = $('#number-cell-' + i + '-' + j);
+
+            if (board[i][j] === 0) {
+                theNumberCell.css({
+                    "width": "0",
+                    "height": "0",
+                    "top": getPosTop(i, j) + cellSideLength / 2,
+                    "left": getPosLeft(i, j) + cellSideLength / 2
+                });
+
+            } else {
+                theNumberCell.css({
+                    "width": cellSideLength,
+                    "height": cellSideLength,
+                    "top": getPosTop(i, j),
+                    "left": getPosLeft(i, j),
+                    "backgroundColor": getNumberBackgroundColor(board[i][j]),
+                    "color": getNumberColor(board[i][j])
+                });
+
+                if (board[i][j] > 1000) {
+                    theNumberCell.css({
+                        "line-height": cellSideLength + "px",
+                        "height": cellSideLength + "px",
+                        "font-size": 0.4 * cellSideLength + "px"
+                    });
+                } else {
+                    theNumberCell.css({
+                        "line-height": cellSideLength + "px",
+                        "height": cellSideLength + "px",
+                        "font-size": 0.6 * cellSideLength + "px"
+                    });
+                }
+                theNumberCell.text(board[i][j]);
+            }
+            hasConflicted[i][j] = false;
+        }
+    }
+}
+```
+
+
+
 - 手势触控
 
-  - `event.touches` 
+  - `event.touches` 获得多点触控的信息，项目中我们使用到的只是单点触控，因此使用`event.touches[0]` 
 
     使用到其中的2个 API ，分别为 `event.touches[0].pageX` 和 `event.touches[0].pageY`
 
@@ -318,19 +441,114 @@
      var deltaX = endx - startx;
      var deltaY = endy - starty;
      
-     if (deltaX > 0) {
-           //move right
-          } else {
-            //move left
-       }
-       if (deltaY > 0) {
-           //move down
-          } else {
-            //move up
-       }
+    // 比较绝对值，判断用户的手势是在哪个方向上滑动
+     if (Math.abs(deltaX) >= Math.abs(deltaY)) {
+            if (deltaX > 0) {
+                //move right
+            } else {
+                //move left
+            }
+        } else {
+            if (deltaY > 0) {
+                //move down
+            } else {
+                //move up
+            }
+        }
      
     ```
 
-  - 遇到问题：
+  - 一些其他细节
 
-    ​
+  （1）在随机生成找到空位和填充随机数时，需要注意一个问题
+
+
+```js
+function generateOneNumber() {
+
+    if (nospace(board)) {
+        return false;
+    }
+    //随机找到一个位置
+    var randx = parseInt(Math.floor(Math.random() * 4));
+    var randy = parseInt(Math.floor(Math.random() * 4));
+    var times = 0;
+    while (true) {
+        if (board[randx][randy] === 0) {
+            break;
+        }
+        randx = Math.floor(Math.random() * 4);
+        randy = Math.floor(Math.random() * 4);
+        times++;
+    }
+
+    var randNumber = Math.random() > 0.5 ? 2 : 4;
+    //在随机位置显示随机字符
+    board[randx][randy] = randNumber;
+    showNumberWithAnimation(randx, randy, randNumber);
+    return true;
+
+}
+```
+
+这其中，使用到了一个 `while(true){code...}` 的循环来不断查找是否有空的的位置，在这里使用 `while(true)` 是不太可取的，因为这个一直查找到过程中，一方面会比较消耗性能，一方面可能会等待很久的时间，因此，我们把它改写成
+
+```js
+function generateOneNumber() {
+
+    if (nospace(board)) {
+        return false;
+    }
+    //随机找到一个位置
+    var randx = parseInt(Math.floor(Math.random() * 4));
+    var randy = parseInt(Math.floor(Math.random() * 4));
+    var times = 0;
+    while (times < 50) { // 最多只允许查找50次
+        if (board[randx][randy] === 0) {
+            break;
+        }
+        randx = Math.floor(Math.random() * 4);
+        randy = Math.floor(Math.random() * 4);
+        times++;
+    }
+    //随机查找空位失败后手动查找
+    if (times === 50) {
+        for (var i = 0; i < 4; i++) {
+            for (var j = 0; j < 4; j++) {
+                if (board[i][j] === 0) {
+                    randx = i;
+                    randy = j;
+                    j = 4;
+                    i = 4;
+                }
+            }
+        }
+    }
+    //随机一个数字
+    var randNumber = Math.random() > 0.5 ? 2 : 4;
+    //在随机位置显示随机字符
+    board[randx][randy] = randNumber;
+    showNumberWithAnimation(randx, randy, randNumber);
+
+    return true;
+
+}
+```
+
+设置最多只允许它查找50次，如果过了就手动设置这个随机位置
+
+（2）在移动端使用的时候，可能会遇到一个小问题，即不小心触发 `touchmove` 事件，因此，我们需要对它进行处理
+
+```js
+document.addEventListener("touchmove", function(event) {
+    event.preventDefault();
+});
+```
+
+
+
+参考资料：
+
+- [touches-js](https://segmentfault.com/q/1010000002870710)
+- [Animate-jQuery](http://www.w3school.com.cn/jquery/effect_animate.asp)
+- [2048小游戏-慕课网](https://www.imooc.com/learn/76)

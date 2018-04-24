@@ -2,7 +2,6 @@
 var board = new Array();
 var score = 0;
 var hasConflicted = new Array();
-var lock = false;
 var startx = 0;
 var starty = 0;
 var endx = 0;
@@ -11,37 +10,12 @@ var endy = 0;
 function newgame() {
     //初始化棋盘格
     init();
-    updataBoardView();
+    updateBoardView();
     //随机两个格子生成数字
     generateOneNumber();
     generateOneNumber();
     score = 0;
     updateScore(score)
-}
-
-function prepareForMobile() {
-
-    if (documentWidth > 500) {
-        gridContainerWidth = 500;
-        cellSpace = 20;
-        cellSideLength = 100;
-    }
-
-    var $gridContainer = $("#grid-container");
-    var $gridCell = $(".grid-cell");
-    $gridContainer.css({
-        "width": gridContainerWidth - 2 * cellSpace,
-        "height": gridContainerWidth - 2 * cellSpace,
-        "padding": cellSpace,
-        "border-radius": 0.02 * gridContainerWidth
-    });
-    $gridCell.css({
-        "width": cellSideLength,
-        "height": cellSideLength,
-        // "line-height": gridContainerWidth - 2 * cellSpace,
-        "border-radius": 0.02 * gridContainerWidth
-    });
-
 }
 
 function init() {
@@ -70,7 +44,7 @@ function init() {
     $(".gameover").remove();
 }
 
-function updataBoardView() {
+function updateBoardView() {
     $('.number-cell').remove();
     for (var i = 0; i < 4; i++) {
         for (var j = 0; j < 4; j++) {
@@ -114,7 +88,6 @@ function updataBoardView() {
             hasConflicted[i][j] = false;
         }
     }
-    lock = false;
 }
 
 function generateOneNumber() {
@@ -123,16 +96,16 @@ function generateOneNumber() {
         return false;
     }
     //随机找到一个位置
-    var randx = parseInt(Math.floor(Math.random() * 4));
-    var randy = parseInt(Math.floor(Math.random() * 4));
+    var randx = Math.floor(Math.random() * 4);
+    var randy = Math.floor(Math.random() * 4);
     var times = 0;
     while (times < 50) {
         if (board[randx][randy] === 0) {
             break;
         }
 
-        randx = parseInt(Math.floor(Math.random() * 4));
-        randy = parseInt(Math.floor(Math.random() * 4));
+        randx = Math.floor(Math.random() * 4);
+        randy = Math.floor(Math.random() * 4);
 
         times++;
     }
@@ -159,28 +132,38 @@ function generateOneNumber() {
 
 }
 
-function isGameOver() {
-    if (nospace(board) && nomove(board)) {
-        showGameOver();
-    }
-}
-
-function showGameOver() {
-    var $message = $("<div class='gameover'><div class='gameover-message'><p>胜败乃兵家常事，</p><p>少侠请重新来过~</p></div></div>");
-    $("#grid-container").append($message);
-}
-
-function nospace(board) {
-
-    for (var i = 0; i < 4; i++) {
-        for (var j = 0; j < 4; j++) {
-            if (board[i][j] === 0) {
-                return false;
+$(document).on("keyup", function(event) {
+    event.preventDefault();
+    var code = event.keyCode;
+    switch (code) {
+        case 37:
+            if (moveLeft()) {
+                setTimeout(isGameOver, 300);
             }
-        }
+            break;
+        case 38:
+            if (moveUp()) {
+                setTimeout(isGameOver, 300);
+            }
+            break;
+        case 39:
+            if (moveRight()) {
+                setTimeout(isGameOver, 300);
+            }
+            break;
+        case 40:
+            if (moveDown()) {
+                setTimeout(isGameOver, 300);
+            }
+            break;
+        default:
+            break;
+
     }
-    return true;
-}
+});
+$(document).on("keydown", function() {
+    event.preventDefault();
+});
 
 function moveLeft() {
     if (!canMoveLeft(board)) {
@@ -203,10 +186,8 @@ function moveLeft() {
                         //add
                         board[i][k] += board[i][j];
                         board[i][j] = 0;
-
                         score += board[i][k];
                         updateScore(score);
-
                         hasConflicted[i][k] = true;
                         break;
                     }
@@ -216,12 +197,11 @@ function moveLeft() {
 
     }
     setTimeout(function() {
-        updataBoardView();
+        updateBoardView();
         generateOneNumber();
     }, 250);
     return true;
 }
-
 
 function moveRight() {
     if (!canMoveRight(board)) {
@@ -255,7 +235,7 @@ function moveRight() {
         }
     }
     setTimeout(function() {
-        updataBoardView();
+        updateBoardView();
         generateOneNumber();
     }, 250);
     return true;
@@ -291,7 +271,7 @@ function moveUp() {
         }
     }
     setTimeout(function() {
-        updataBoardView();
+        updateBoardView();
         generateOneNumber();
     }, 250);
     return true;
@@ -329,63 +309,76 @@ function moveDown() {
         }
     }
     setTimeout(function() {
-        updataBoardView();
+        updateBoardView();
         generateOneNumber();
     }, 250);
     return true;
 }
 
+function nospace(board) {
+
+    for (var i = 0; i < 4; i++) {
+        for (var j = 0; j < 4; j++) {
+            if (board[i][j] === 0) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+function isGameOver() {
+    if (nospace(board) && nomove(board)) {
+        showGameOver();
+    }
+}
+
+function showGameOver() {
+    var $message = $("<div class='gameover'><div class='gameover-message'><p>胜败乃兵家常事，</p><p>少侠请重新来过~</p></div></div>");
+    $("#grid-container").append($message);
+}
+
+
+
+
+// 移动端操作相关 
 $(document).ready(function() {
     prepareForMobile();
     newgame();
 });
 
-$(document).on("keyup", function(event) {
-    event.preventDefault();
-    // if (lock) {
-    //     return;
-    // }
-    var code = event.keyCode;
-    lock = true;
-    switch (code) {
-        case 37:
-            if (moveLeft()) {
-                setTimeout(isGameOver, 300);
-            }
-            break;
-        case 38:
-            if (moveUp()) {
-                setTimeout(isGameOver, 300);
-            }
-            break;
-        case 39:
-            if (moveRight()) {
-                setTimeout(isGameOver, 300);
-            }
-            break;
-        case 40:
-            if (moveDown()) {
-                setTimeout(isGameOver, 300);
-            }
-            break;
-        default:
-            break;
+function prepareForMobile() {
 
+    if (documentWidth > 500) {
+        gridContainerWidth = 500;
+        cellSpace = 20;
+        cellSideLength = 100;
     }
-});
-$(document).on("keydown", function() {
-    event.preventDefault();
-});
+
+    var $gridContainer = $("#grid-container");
+    var $gridCell = $(".grid-cell");
+    $gridContainer.css({
+        "width": gridContainerWidth - 2 * cellSpace,
+        "height": gridContainerWidth - 2 * cellSpace,
+        "padding": cellSpace,
+        "border-radius": 0.02 * gridContainerWidth
+    });
+    $gridCell.css({
+        "width": cellSideLength,
+        "height": cellSideLength,
+        "line-height": gridContainerWidth - 2 * cellSpace,
+        "border-radius": 0.02 * gridContainerWidth
+    });
+
+}
+
 document.addEventListener("touchstart", function(event) {
     startx = event.touches[0].pageX;
     starty = event.touches[0].pageY;
 
 });
+
 document.addEventListener("touchend", function(event) {
-    // if (lock) {
-    //     return;
-    // }
-    lock = true;
     endx = event.changedTouches[0].pageX;
     endy = event.changedTouches[0].pageY;
 
@@ -409,9 +402,8 @@ document.addEventListener("touchend", function(event) {
             }
         }
 
-
     } else {
-
+        
         if (deltaY > 0) {
             //move down
             if (moveDown()) {
@@ -427,7 +419,8 @@ document.addEventListener("touchend", function(event) {
 
     }
 });
+
 document.addEventListener("touchmove", function(event) {
     event.preventDefault();
-
 });
+
