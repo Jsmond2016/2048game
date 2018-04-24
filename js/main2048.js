@@ -276,7 +276,6 @@ function moveUp() {
                         board[k][j] = board[i][j];
                         board[i][j] = 0;
                         break;
-
                     } else if (board[k][j] == board[i][j] && noBlockVertical(j, k, i, board) && !hasConflicted[k][j]) {
                         showMoveAnimation(i, j, k, j);
                         //add
