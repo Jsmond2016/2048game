@@ -15,6 +15,8 @@ function newgame() {
     //随机两个格子生成数字
     generateOneNumber();
     generateOneNumber();
+    score = 0;
+    updateScore(score)
 }
 
 function prepareForMobile() {
@@ -109,10 +111,7 @@ function updataBoardView() {
                 }
                 theNumberCell.text(board[i][j]);
             }
-
-
             hasConflicted[i][j] = false;
-
         }
     }
     lock = false;
